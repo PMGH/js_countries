@@ -1,3 +1,5 @@
+var countryArray = [];
+
 var makeRequest = function(url, callback){
   // create new XHR  (XMLHttpRequest() is built into JavaScript)
   var request = new XMLHttpRequest();
@@ -36,6 +38,7 @@ var populateList = function(countries){
   var ul = document.getElementById('country-list');
 
   for (var country of countries){
+    countryArray.push(country);
     // new li
     var li = document.createElement('li');
     // get country name and amend li innerText
@@ -67,28 +70,59 @@ var removeChildren = function(node){
   }
 }
 
-var displayCountryDetails = function(selectedCountry){
+var findCountryByName = function(countryArray, selectedCountry){
+  for (var country of countryArray){
+    if (country.name === selectedCountry){
+      return country;
+    }
+  }
+}
 
+var displayCountryDetails = function(countryArray, selectedCountry){
+  var selectedCountry = findCountryByName(countryArray, selectedCountry);
+
+  var div = document.getElementById('country-details');
+  var ul = document.createElement('ul');
+  div.appendChild(ul);
+
+  var nameLi = document.createElement('li');
+  var populationLi = document.createElement('li');
+  var capitalLi = document.createElement('li');
+
+  nameLi.innerText = "Name: " + selectedCountry.name;
+  populationLi.innerText = "Population: " + selectedCountry.population;
+  capitalLi.innerText = "Capital: " + selectedCountry.capital;
+
+  ul.appendChild(nameLi);
+  ul.appendChild(populationLi);
+  ul.appendChild(capitalLi);
 }
 
 
 var app = function(){
-  var showCountriesButton = document.getElementById('button-show-countries');
-  showCountriesButton.addEventListener('click', function(){
-    // disable the button after click ('this' is the button that was clicked)
-    this.disabled = "disabled";
-    // set url
-    var url = "https://restcountries.eu/rest/v2/all";
-    // make request
-    makeRequest(url, requestComplete);
+  // set url
+  var url = "https://restcountries.eu/rest/v2/all";
+  // make request
+  makeRequest(url, requestComplete);
 
-    var countriesSelect = document.getElementById('select-countries');
-    countriesSelect.addEventListener('change', function(){
-      var selectedCountry = countriesSelect.innerText;
-      var countryList = document.getElementById('country-list');
-      removeChildren(countryList);
-      displayCountryDetails(selectedCountry);
-    });
+
+  // var showCountriesButton = document.getElementById('button-show-countries');
+  // showCountriesButton.addEventListener('click', function(){
+  //   // disable the button after click ('this' is the button that was clicked)
+  //   this.disabled = "disabled";
+  // });
+
+
+  var countriesSelect = document.getElementById('select-countries');
+  countriesSelect.addEventListener('change', function(){
+    // get selected country from dropdown and get countryList (ul)
+    var selectedIndex = countriesSelect.selectedIndex;
+    var selectedCountry = countriesSelect[selectedIndex].value;
+    var countryList = document.getElementById('country-list');
+    // clear countryList - remove children from the countryList
+    removeChildren(countryList);
+    // display details of the selected country
+    displayCountryDetails(countryArray, selectedCountry);
   });
 }
 
